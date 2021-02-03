@@ -4,7 +4,7 @@ Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
 
 
 boolean getMCP9808() {
-  float tempC=0;
+//  float tempC=0;
   float tempF=0;
   int tempFint=0;
   unsigned long getMCP9808startTime = millis();
@@ -22,33 +22,31 @@ boolean getMCP9808() {
   //  2    0.125°C     130 ms
   //  3    0.0625°C    250 ms
 
-
-
-
  // Serial.println("wake up MCP9808.... "); // wake up MCP9808 - power consumption ~200 mikro Ampere
   tempsensor.wake();   // wake up, ready to read!
 
   // Read and print out the temperature, also shows the resolution mode used for reading.
   Serial.print("Resolution in mode: ");
   Serial.println (tempsensor.getResolution());
-  tempC = tempsensor.readTempC();
+//  tempC = tempsensor.readTempC();
   tempF = tempsensor.readTempF();
   tempFint = round(tempF);
+  Serial.print("EEPROM data: ");
   Serial.println(EEPROM.read(0));
-  Serial.print("Temp: ");
-  Serial.print(tempC, 4); Serial.print("*C\t and ");
-  Serial.print(tempF, 4); Serial.println("*F.");
+//  Serial.print("Temp: ");
+//  Serial.print(tempC, 4); Serial.print("*C\t and ");
+//  Serial.print(tempF, 4); Serial.println("*F.");
   Serial.println("Shutdown MCP9808.... ");
   tempsensor.shutdown_wake(1); // shutdown MSP9808 - power consumption ~0.1 mikro Ampere, stops temperature sampling
 
 
-  if (strcmp(config.buttonMessage, "C") == 0) {
-    Serial.println("Sending  in C");
-    dtostrf(tempC, 1, 2, temperatureString);//convert float to str
-  } else { //in F
+  //if (strcmp(config.buttonMessage, "C") == 0) {
+  //  Serial.println("Sending  in C");
+  //  dtostrf(tempC, 1, 2, temperatureString);//convert float to str
+  //} else { //in F
     Serial.println("Sending  in F");
     dtostrf(tempF, 1, 0, temperatureString);//convert float to str
-  }
+  //}
   Serial.print("ms to measure ");
   Serial.println(millis() - getMCP9808startTime);
 
@@ -60,6 +58,7 @@ boolean getMCP9808() {
    return true;
  }
  else {
-   return false;
+  Serial.println("No change, no send");
+  return false;
  }
 }
