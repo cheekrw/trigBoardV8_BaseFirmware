@@ -7,6 +7,7 @@
 #include <WiFi.h>
 #include <Wire.h>//for I2C RTC
 //#include <WiFiUdp.h>
+#include <esp_now.h>
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>//for mqtt
 

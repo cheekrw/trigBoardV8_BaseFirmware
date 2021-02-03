@@ -4,7 +4,6 @@ Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
 
 
 boolean getMCP9808() {
-//  float tempC=0;
   float tempF=0;
   int tempFint=0;
   unsigned long getMCP9808startTime = millis();
