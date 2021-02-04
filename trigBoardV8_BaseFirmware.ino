@@ -30,15 +30,37 @@ void setup() {
   if (getMCP9808()) {
     Serial.println("Hello Roger");
     Serial.println(temperatureString);
-    //all of the ESPNOW stuff
-    esp_now_init();
-    esp_now_set_self_role(ESP_NOW_ROLE_CONTROLLER);
-    esp_now_add_peer(gatewayMac, ESP_NOW_ROLE_SLAVE, 1, key, 16);
-    esp_now_set_peer_key(gatewayMac, key, 16);
-    esp_now_register_send_cb([](uint8_t* mac, uint8_t sendStatus) {//this is the function that is called to send data
-      Serial.printf("send_cb, send done, status = %i\n", sendStatus);
-      digitalWrite(DONEpin, HIGH);//all good, kill power
-    });
+//all of the ESPNOW stuff
+// Set device as a Wi-Fi Station
+  WiFi.mode(WIFI_STA);
+
+// Init ESP-NOW
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("Error initializing ESP-NOW");
+    return;
+  }
+
+  // Register peer
+  esp_now_peer_info_t peerInfo;
+  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  peerInfo.channel = 0;
+  peerInfo.encrypt = false;
+
+  // Add peer
+  if (esp_now_add_peer(&peerInfo) != ESP_OK){
+    Serial.println("Failed to add peer");
+    return;
+  }
+
+  // Send message via ESP-NOW
+  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
+
+  if (result == ESP_OK) {
+    Serial.println("Sent with success");
+  }
+  else {
+    Serial.println("Error sending the data");
+  }
 
     char payload[100];//limit is liek 200bytes, but we don't need anything close to that
     //below you can see how a message is formated. The title is before the $, the message is after.  We'll use that to parse at the Cell modem
@@ -54,7 +76,6 @@ void setup() {
     uint8_t bs[strlen(payload)];
     memcpy(bs, &payload, strlen(payload));
     esp_now_send(gatewayMac, bs, strlen(payload));
-    delay(1000);
   }
 
   }
